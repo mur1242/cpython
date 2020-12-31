@@ -1961,6 +1961,7 @@ class BadSysLogHandlerTest(unittest.TestCase):
 
     @unittest.skipUnless(sys.platform == 'darwin', 'macOS specific test')
     def test_log_local_on_mac(self):
+        # See issue #38780
         handler = logging.handlers.SysLogHandler(
             facility=logging.handlers.SysLogHandler.LOG_LOCAL7,
             address='/dev/log', socktype=socket.SOCK_RAW
