@@ -1951,6 +1951,36 @@ class UnixSysLogHandlerTest(SysLogHandlerTest):
         SysLogHandlerTest.tearDown(self)
         os_helper.unlink(self.address)
 
+
+@unittest.skipUnless(
+    hasattr(socket, "AF_UNIX"), "Unix sockets required")
+class BadSysLogHandlerTest(unittest.TestCase):
+
+    """An improperly configured SysLogHandler should
+    fail silently."""
+
+    def test_construct_bad_unix(self):
+        handler = logging.handlers.SysLogHandler('/')
+        assert hasattr(handler, 'socket')
+
+    def test_close_bad_unix(self):
+        handler = logging.handlers.SysLogHandler('/')
+        handler.close()
+
+    def test_emit(self):
+        handler = logging.handlers.SysLogHandler('/')
+        record = logging.LogRecord(
+            name='name',
+            level=logging.DEBUG,
+            pathname='pathname',
+            lineno=1,
+            msg='destined for failure',
+            args=None,
+            exc_info=None,
+        )
+        handler.emit(record)
+
+
 @unittest.skipUnless(socket_helper.IPV6_ENABLED,
                      'IPv6 support required for this test.')
 class IPv6SysLogHandlerTest(SysLogHandlerTest):
@@ -5492,7 +5522,8 @@ def test_main():
         ExceptionTest, SysLogHandlerTest, IPv6SysLogHandlerTest, HTTPHandlerTest,
         NTEventLogHandlerTest, TimedRotatingFileHandlerTest,
         UnixSocketHandlerTest, UnixDatagramHandlerTest, UnixSysLogHandlerTest,
-        MiscTestCase
+        MiscTestCase,
+        BadSysLogHandlerTest,
     ]
     if hasattr(logging.handlers, 'QueueListener'):
         tests.append(QueueListenerTest)
