@@ -1959,6 +1959,14 @@ class BadSysLogHandlerTest(unittest.TestCase):
     """An improperly configured SysLogHandler should
     fail silently."""
 
+    @unittest.skipUnless(sys.platform == 'darwin', 'macOS specific test')
+    def test_log_local_on_mac(self):
+        handler = logging.handlers.SysLogHandler(
+            facility=logging.handlers.SysLogHandler.LOG_LOCAL7,
+            address='/dev/log', socktype=socket.SOCK_RAW
+        )
+        self.assertTrue(hasattr(handler, 'socket'))
+
     def test_construct_bad_unix(self):
         handler = logging.handlers.SysLogHandler('/')
         assert hasattr(handler, 'socket')
