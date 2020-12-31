@@ -1969,7 +1969,7 @@ class BadSysLogHandlerTest(unittest.TestCase):
 
     def test_construct_bad_unix(self):
         handler = logging.handlers.SysLogHandler('/')
-        assert hasattr(handler, 'socket')
+        self.assertTrue(hasattr(handler, 'socket'))
 
     def test_close_bad_unix(self):
         handler = logging.handlers.SysLogHandler('/')
