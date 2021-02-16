@@ -1793,6 +1793,12 @@ PySequence_InPlaceRepeat(PyObject *o, Py_ssize_t count)
 }
 
 PyObject *
+_PySequence_Item(PyObject *ob, Py_ssize_t i)
+{
+    return Py_TYPE(ob)->tp_as_sequence->sq_item(ob, i);
+}
+
+PyObject *
 PySequence_GetItem(PyObject *s, Py_ssize_t i)
 {
     if (s == NULL) {
