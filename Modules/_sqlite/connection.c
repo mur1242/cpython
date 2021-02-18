@@ -699,44 +699,38 @@ error:
 static void
 _pysqlite_final_callback(sqlite3_context *context)
 {
-    PyObject* function_result;
-    PyObject** aggregate_instance;
-    _Py_IDENTIFIER(finalize);
-    int ok;
-    PyObject *exception, *value, *tb;
-
     PyGILState_STATE threadstate;
-
     threadstate = PyGILState_Ensure();
 
-    aggregate_instance = (PyObject**)sqlite3_aggregate_context(context, 0);
-    if (aggregate_instance == NULL) {
+    PyObject **instance = (PyObject**)sqlite3_aggregate_context(context, 0);
+    if (instance == NULL) {
         /* No rows matched the query; the step handler was never called. */
         goto error;
     }
-    else if (!*aggregate_instance) {
-        /* this branch is executed if there was an exception in the aggregate's
-         * __init__ */
-
+    else if (*instance == NULL) {
+        /* There was an exception in the aggregate's __init__ method. */
         goto error;
     }
 
     /* Keep the exception (if any) of the last call to step() */
+    PyObject *exception, *value, *tb;
     PyErr_Fetch(&exception, &value, &tb);
 
-    function_result = _PyObject_CallMethodIdNoArgs(*aggregate_instance, &PyId_finalize);
+    /* Call the method and set result */
+    _Py_IDENTIFIER(finalize);
+    PyObject *res = _PyObject_CallMethodIdNoArgs(*instance, &PyId_finalize);
+    Py_DECREF(*instance);
 
-    Py_DECREF(*aggregate_instance);
-
-    ok = 0;
-    if (function_result) {
-        ok = _pysqlite_set_result(context, function_result) == 0;
-        Py_DECREF(function_result);
+    int ok = 0;
+    if (res) {
+        ok = _pysqlite_set_result(context, res) == 0;
+        Py_DECREF(res);
     }
     if (!ok) {
         if (_pysqlite_enable_callback_tracebacks) {
             PyErr_Print();
-        } else {
+        }
+        else {
             PyErr_Clear();
         }
         sqlite3_result_error(context, "user-defined aggregate's 'finalize' method raised error", -1);
