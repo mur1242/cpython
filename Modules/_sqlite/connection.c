@@ -405,7 +405,8 @@ bail:
     }
 }
 
-PyObject* _pysqlite_connection_begin(pysqlite_Connection* self)
+PyObject *
+_pysqlite_connection_begin(pysqlite_Connection *self)
 {
     execute_tx_control_statement(self->db, self->begin_statement);
     if (PyErr_Occurred()) {
