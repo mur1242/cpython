@@ -573,9 +573,18 @@ _pysqlite_build_py_params(sqlite3_context *context, int argc,
                 }
                 break;
             case SQLITE_BLOB: {
+                sqlite3 *db = sqlite3_context_db_handle(context);
                 const void *blob = sqlite3_value_blob(cur_value);
                 Py_ssize_t size = sqlite3_value_bytes(cur_value);
-                cur_py_value = PyBytes_FromStringAndSize(blob, size);
+                if (blob) {
+                    cur_py_value = PyBytes_FromStringAndSize(blob, size);
+                }
+                else if (sqlite3_errcode(db) == SQLITE_NOMEM) {
+                    return PyErr_NoMemory();
+                }
+                else {
+                    cur_py_value = Py_NewRef(Py_None);
+                }
                 break;
             }
             case SQLITE_NULL:
