@@ -474,21 +474,7 @@ _pysqlite_query_execute(pysqlite_Cursor* self, int multiple, PyObject* operation
         goto error;
     }
 
-    if (self->statement->in_use) {
-        Py_SETREF(self->statement,
-                  PyObject_New(pysqlite_Statement, pysqlite_StatementType));
-        if (!self->statement) {
-            goto error;
-        }
-        rc = pysqlite_statement_create(self->statement, self->connection, operation);
-        if (rc != SQLITE_OK) {
-            Py_CLEAR(self->statement);
-            goto error;
-        }
-    }
-
     pysqlite_statement_reset(self->statement);
-    pysqlite_statement_mark_dirty(self->statement);
 
     /* We start a transaction implicitly before a DML statement.
        SELECT is the only exception. See #9924. */
@@ -507,8 +493,6 @@ _pysqlite_query_execute(pysqlite_Cursor* self, int multiple, PyObject* operation
         if (!parameters) {
             break;
         }
-
-        pysqlite_statement_mark_dirty(self->statement);
 
         pysqlite_statement_bind_parameters(self->statement, parameters);
         if (PyErr_Occurred()) {
