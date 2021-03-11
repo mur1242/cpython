@@ -1787,6 +1787,7 @@ finally:
     return Py_NewRef(Py_None);
 }
 
+#ifdef SQLITE_ENABLE_RTREE
 static int
 rtree_callback(sqlite3_rtree_query_info *info)
 {
@@ -1901,6 +1902,7 @@ error:
     PyGILState_Release(tstate);
     return rc;
 }
+#endif  // SQLITE_ENABLE_RTREE
 
 /*[clinic input]
 _sqlite3.Connection.create_rtree_query_function as pysqlite_connection_create_rtree_query_function
@@ -1920,6 +1922,7 @@ pysqlite_connection_create_rtree_query_function_impl(pysqlite_Connection *self,
                                                      PyObject *callback)
 /*[clinic end generated code: output=bf3ae7bd13b4474f input=de379655c7d06223]*/
 {
+#ifdef SQLITE_ENABLE_RTREE
     int rc;
     if (callback == Py_None) {
         rc = sqlite3_rtree_query_callback(self->db, name, 0, 0, 0);
@@ -1937,6 +1940,11 @@ pysqlite_connection_create_rtree_query_function_impl(pysqlite_Connection *self,
         return NULL;
     }
     Py_RETURN_NONE;
+#else
+    PyErr_SetString(pysqlite_NotSupportedError,
+                    "This SQLite library has no R*Tree module.");
+    return NULL;
+#endif  // SQLITE_ENABLE_RTREE
 }
 
 /*[clinic input]
