@@ -1619,6 +1619,11 @@ class PyBuildExt(build_ext):
                                library_dirs=sqlite_libdir,
                                extra_link_args=sqlite_extra_link_args,
                                libraries=["sqlite3",]))
+            self.add(Extension('_sqlite3_rtree', ['_sqlite/rtree.c'],
+                               include_dirs=include_dirs,
+                               library_dirs=sqlite_libdir,
+                               extra_link_args=sqlite_extra_link_args,
+                               libraries=["sqlite3",]))
         else:
             self.missing.append('_sqlite3')
 

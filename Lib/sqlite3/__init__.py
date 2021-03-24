@@ -22,6 +22,25 @@
 
 from sqlite3.dbapi2 import *
 
+def setup_rtree_support():
+    """Import R*Tree support, if possible."""
+    try:  # Check if this sqlite3 module was compiled with R*Tree support.
+        import _sqlite3_rtree as rtree
+    except ImportError:
+        def wrapper(self, name, func):
+            raise NotImplementedError("R*Tree support is not available")
+    else:
+        import functools
+        @functools.wraps(rtree.create_query_function)
+        def wrapper(self, name, func):
+            rtree.create_query_function(self, name, func)
+
+    Connection.create_rtree_query_function = wrapper
+    Connection.create_rtree_query_function.__name__ = "create_rtree_query_function"
+    Connection.create_rtree_query_function.__doc__ = wrapper.__doc__
+
+setup_rtree_support()
+del setup_rtree_support
 
 # bpo-42264: OptimizedUnicode was deprecated in Python 3.10.  It's scheduled
 # for removal in Python 3.12.

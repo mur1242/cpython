@@ -749,55 +749,6 @@ exit:
     return return_value;
 }
 
-PyDoc_STRVAR(pysqlite_connection_create_rtree_query_function__doc__,
-"create_rtree_query_function($self, name, callback, /)\n"
-"--\n"
-"\n"
-"Creates an R*Tree query function. Non-standard.\n"
-"\n"
-"  name\n"
-"    The name of the SQL function.\n"
-"  callback\n"
-"    The R*Tree query callback function.");
-
-#define PYSQLITE_CONNECTION_CREATE_RTREE_QUERY_FUNCTION_METHODDEF    \
-    {"create_rtree_query_function", (PyCFunction)(void(*)(void))pysqlite_connection_create_rtree_query_function, METH_FASTCALL, pysqlite_connection_create_rtree_query_function__doc__},
-
-static PyObject *
-pysqlite_connection_create_rtree_query_function_impl(pysqlite_Connection *self,
-                                                     const char *name,
-                                                     PyObject *callback);
-
-static PyObject *
-pysqlite_connection_create_rtree_query_function(pysqlite_Connection *self, PyObject *const *args, Py_ssize_t nargs)
-{
-    PyObject *return_value = NULL;
-    const char *name;
-    PyObject *callback;
-
-    if (!_PyArg_CheckPositional("create_rtree_query_function", nargs, 2, 2)) {
-        goto exit;
-    }
-    if (!PyUnicode_Check(args[0])) {
-        _PyArg_BadArgument("create_rtree_query_function", "argument 1", "str", args[0]);
-        goto exit;
-    }
-    Py_ssize_t name_length;
-    name = PyUnicode_AsUTF8AndSize(args[0], &name_length);
-    if (name == NULL) {
-        goto exit;
-    }
-    if (strlen(name) != (size_t)name_length) {
-        PyErr_SetString(PyExc_ValueError, "embedded null character");
-        goto exit;
-    }
-    callback = args[1];
-    return_value = pysqlite_connection_create_rtree_query_function_impl(self, name, callback);
-
-exit:
-    return return_value;
-}
-
 PyDoc_STRVAR(pysqlite_connection_enter__doc__,
 "__enter__($self, /)\n"
 "--\n"
@@ -860,4 +811,4 @@ exit:
 #ifndef PYSQLITE_CONNECTION_LOAD_EXTENSION_METHODDEF
     #define PYSQLITE_CONNECTION_LOAD_EXTENSION_METHODDEF
 #endif /* !defined(PYSQLITE_CONNECTION_LOAD_EXTENSION_METHODDEF) */
-/*[clinic end generated code: output=0c246cc333944c87 input=a9049054013a1b77]*/
+/*[clinic end generated code: output=c350732a2758c8c1 input=a9049054013a1b77]*/
